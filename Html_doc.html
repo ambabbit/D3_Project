@@ -17,7 +17,7 @@
         top: 0px;
         bottom: 0px;
         }
-        .states {
+        .countries {
           fill: lightgray;
         }
         .states :hover {
@@ -37,12 +37,10 @@
           pointer-events: none;
         }
 
-        .counties-border {
+        .graticule {
           fill: none;   
-          stroke: white;
+          stroke: lightgray;
           stroke-width: 0.5px;
-          stroke-linejoin: round;
-          stroke-linecap: round;
           pointer-events: none;
 
         }
@@ -65,64 +63,123 @@
         <script src="https://d3js.org/d3.v4.min.js"></script>
         <script src="https://d3js.org/topojson.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+        <script src="https://d3js.org/d3-drag.v1.min.js"></script>
         <script>
         
         var svg = d3.select("svg");
           width = 960,
           height = 500;
 
+          
+          svg.call(d3.drag()
+              .on("drag", function() {
+                var rotation = projection.rotate();
+
+                projection.rotate([rotation[0] + d3.event.dx * 0.3, rotation[1] - d3.event.dy * 0.3, rotation[2]]);
+                svg.selectAll("path").attr("d", path);
+
+                rotate[0] = rotation[0];
+                rotate[1] = rotation[1];
+              }))
+
+
         var g = svg.append("g");
         
+        var globePositionX, globePositionY;
 
         var chartDiv = document.getElementById("div");
-        redraw();
 
         var projection = d3.geoOrthographic()
             .scale(300)
             .translate([width / 2, height / 2])
-            .precision(0.1);
+            .precision(0.1)
+            .clipAngle(90);
+            
+        redraw();
 
         var path = d3.geoPath().projection(projection);
 
-        var color = d3.scaleLinear().domain([1,10]).range(["white", "green"]);
+        var color = d3.scaleLinear().domain([1,100]).range(["green", "brown"]);
+        var graticular = d3.geoGraticule();
+        var airports = d3.csv("Test_Data/airports.csv");
 
-        
+        console.log(airports);
+
+        var baseTime = Date.now();
+        var rotate = [0, -15];
+        var velocity = [0.25, 0];
+
         window.addEventListener("resize", redraw);
+        var spinning = true;
 
         function redraw() {
           width = chartDiv.clientWidth;
           height = chartDiv.clientHeight;
 
+          globePositionX = width * (1/2);
+          globePositionY = height * (1/2);
+
           // Use the extracted size to set the size of an SVG element.
           svg
             .attr("width", width)
-            .attr("height", height)
-            .style("fill", "#006994");
+            .attr("height", height);  
+
+          projection
+            .scale(300)
+            .translate([globePositionX, globePositionY])
+            .precision(0.1)
+            .clipAngle(90);
+          
+          svg.selectAll("circle")
+            .attr("cx", globePositionX)
+            .attr("cy", globePositionY)
+
+          svg.selectAll("path").attr("d", path);
+
         }
 
-        d3.json("//cdn.jsdelivr.net/npm/world-atlas@2/countries-50m.json", function(error, us) {
-          if (error) throw error;
-          g.append("circle")
-            .attr("cx", width/2)
-            .attr("cy", height/2)
-            .attr("r", 300)
+        svg.on("dblclick", function() {
+            if (spinning) {
+              stopSpin();
+            } else {
+              startSpin();
+            }
+          });
 
+        d3.json("//cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json", function(error, world) {
+          if (error) throw error;
+          drawGraticule();
+          
+          g.append("circle")
+            .attr("cx", globePositionX)
+            .attr("cy", globePositionY)
+            .attr("r", 300)
+            .style("fill", "none")
+            .style("stroke-width", "0.5px")
+            .style("stroke", "#006994")
 
           g.append("g")
-            .attr("class","counties")
-            .selectAll("path")  
-            .data(topojson.feature(us, us.objects.countries).features)
+            .selectAll("path")    
+            .data(topojson.feature(world, world.objects.countries).features)
             .enter().append("path")
+            .attr("class","countries")
             .attr("d", path)
-            .style("fill", d => color(Math.random() * (10-1) +1))
-            //.on("click", reset)
+            .style("fill", d => color(Math.random() * (100-1) +1))
+            .style("stroke", "#006994")
+            .style("stroke-width", "0.75px")
+            .style("opacity", "0.5")
             .append("title")
             .text(d => d.properties.name);  
 
-          g.append("g")
-            .append("path")
-            .attr("class","counties-border")
-            .attr("d", path(topojson.mesh(us, us.objects.countries, function(a,b) { return a !== b;})))
+          console.log(path);
+
+          g.append("g").selectAll("path")
+            .data(graticular)
+            .attr("d", path)
+            .style("stroke", "grey")
+            .style("stroke-width", ".5px");
+
+          startSpin();
           /*
           svg.append("g") //add states
             .selectAll("path")
@@ -147,38 +204,55 @@
             .attr("class", "selected-state");
             console.log(this);
           });*/
-
         });
 
-  function clicked(d) {
-    var x, y, k;
-      console.log(d);
-    if (d && center !== d) {
-      var centroid = path.centroid(d);
-      x = centroid[0];
-      y = centroid[1];
-      k = 4;
-      center = d;
-    } else {
-      x = width / 2;
-      y = height / 2;
-      k = 1;
-      center = null;
-    }
 
-    g.selectAll("path")
-        .classed("active", center && function(d) { return d === center; });
 
-    g.transition()
-        .duration(750)
-        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")scale(" + k + ")translate(" + -x + "," + -y + ")")
-        .style("stroke-width", 1.5 / k + "px");
+        function drawGraticule() {
+                const graticule = d3.geoGraticule()
+                    .step([10, 10]);
 
-    d3.select(this).style("display", "none");
-}
-  function reset() {
+                svg.append("path")
+                    .datum(graticule)
+                    .attr("class", "graticule")
+                    .attr("d", path)
+                    .style("fill", "none")
+                    .style("stroke", "#ccc")
+                    .style("opacity", 0.6);
+            }
+
+
+var timer;
+
+  function startSpin() { 
     
+    currentTime =  
+
+    timer = d3.timer(function() {
+      var dt = Date.now() - baseTime;
+      currentTime = Date.now();
+
+      spinning = true;
+
+      rotate[0] += (velocity[0])
+      rotate[1] += (velocity[1])
+
+      rotate[0] = rotate[0] %360;
+      rotate[1] = rotate[1] %360;
+      
+      projection.rotate([rotate[0], rotate[1]]);    
+
+      svg.selectAll("path ").attr("d", path);
+    });
   }
+
+  function stopSpin() {
+    timer.stop(); 
+
+    spinning = false;
+    stoppedTime = Date.now();
+}
+
         </script>
     <p></p>
   </body>
