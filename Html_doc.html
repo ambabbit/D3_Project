@@ -2,7 +2,6 @@
 <html>
   <head>
         <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
-        <script type="text/javascript" src="Scripts.js"></script>
         <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
   </head>
@@ -45,6 +44,10 @@
 
         }
 
+        .marker {
+          pointer-events: none;
+        }
+
         .selected-state {
           fill: blue;
         }
@@ -64,8 +67,9 @@
         <script src="https://d3js.org/topojson.v2.min.js"></script>
         <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
         <script src="https://d3js.org/d3-drag.v1.min.js"></script>
+        <script src="/D3/d3-legend.min.js"></script>
         <script>
-        
+
         var svg = d3.select("svg");
           width = 960,
           height = 500;
@@ -80,6 +84,7 @@
 
                 rotate[0] = rotation[0];
                 rotate[1] = rotation[1];
+                markLocation();
               }))
 
 
@@ -97,13 +102,50 @@
             
         redraw();
 
+       //This is a test
+
         var path = d3.geoPath().projection(projection);
 
-        var color = d3.scaleLinear().domain([1,100]).range(["green", "brown"]);
+        var color = d3.scalePow().exponent(1/1.5).domain([1,633]).range(["white", "green"]);
         var graticular = d3.geoGraticule();
-        var airports = d3.csv("Test_Data/airports.csv");
+        var airport_location = [];
+/*
+        d3.csv("/Test_Data/airports_edit.csv", function(data) {
+          data.forEach(function (d,i) {
+            airport_location[i] = 
+            [{
+              iata: d.iata,
+              name: d.name,
+              city:  d.city,
+              state:  d.state,
+              country:  d.country,
+              latitude:  +d.latitude,
+              longitude:  +d.longitude
+            }]
+          })
+        }); */
 
-        console.log(airports);
+
+        var airports = new Map();
+
+        d3.csv("/Test_Data/Number_of_airports.csv", function(data){
+          data.forEach(function(d,i) {
+            airports.set(d.ID_number, d.Airports)
+          });
+        });
+
+        
+        d3.json("/Test_Data/airports.json", function(data){
+          data.forEach(function (d,i) {
+            airport_location[i] = 
+            [{
+              country: d.country,
+              name: d.name,
+              latitude:  +d.lat,
+              longitude:  +d.lon
+            }]
+          })
+        });
 
         var baseTime = Date.now();
         var rotate = [0, -15];
@@ -164,14 +206,12 @@
             .enter().append("path")
             .attr("class","countries")
             .attr("d", path)
-            .style("fill", d => color(Math.random() * (100-1) +1))
+            .style("fill", d => color(airports.get(d.id)))
+            .style("opacity", "1")
             .style("stroke", "#006994")
             .style("stroke-width", "0.75px")
-            .style("opacity", "0.5")
             .append("title")
-            .text(d => d.properties.name);  
-
-          console.log(path);
+            .text(d => d.properties.name + ", " + airports.get(d.id));
 
           g.append("g").selectAll("path")
             .data(graticular)
@@ -179,7 +219,16 @@
             .style("stroke", "grey")
             .style("stroke-width", ".5px");
 
-          startSpin();
+          var legend = d3.legendColor()
+              .labelFormat(d3.format(".2f"))
+              .useClass(true)
+              .title("A really really really really really long title")
+              .titleWidth(100)
+              .scale(color);
+
+          svg.select(".legendQuant")
+            .call(legend);
+              startSpin();
           /*
           svg.append("g") //add states
             .selectAll("path")
@@ -243,7 +292,32 @@ var timer;
       projection.rotate([rotate[0], rotate[1]]);    
 
       svg.selectAll("path ").attr("d", path);
+     markLocation();
+
     });
+  }
+
+  function markLocation() {
+    const markers = g.selectAll("circle")
+            .data(airport_location);
+            markers
+            .enter()
+            .append("circle")
+            .attr("class", "marker")
+            .merge(markers)
+            .attr("cx", d => projection([d[0].longitude, d[0].latitude])[0])
+            .attr("cy", d => projection([d[0].longitude, d[0].latitude])[1])
+            .attr("r", 2)
+            .attr('fill', d => {
+                        const coordinate = [d[0].longitude, d[0].latitude];
+                        gdistance = d3.geoDistance(coordinate, projection.invert([width/2, height/2]));
+                        return gdistance > 1.4 ? 'none' : 'blue';
+                    });
+
+
+            g.each(function () {
+                    this.parentNode.appendChild(this);
+                });
   }
 
   function stopSpin() {
