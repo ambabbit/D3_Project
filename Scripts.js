@@ -1,2 +1,5 @@
+var startTimeJS = Date.now();
 
-import {legend} from "@d3/color-legend"
+function printStartTime() {
+    console.log(startTimeJS-Date.now());    
+}
