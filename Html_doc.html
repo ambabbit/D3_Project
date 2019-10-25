@@ -51,6 +51,13 @@
         .selected-state {
           fill: blue;
         }
+
+        .arc {
+          fill: none;
+          stroke: red;
+          stroke-width: 3px;
+          stroke-linecap: round;
+        }
         
         
         </style>
@@ -135,17 +142,28 @@
         });
 
         
-        d3.json("/Test_Data/airports.json", function(data){
-          data.forEach(function (d,i) {
+        d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
+          data.forEach(function(d,i) {
             airport_location[i] = 
             [{
-              country: d.country,
-              name: d.name,
-              latitude:  +d.lat,
-              longitude:  +d.lon
-            }]
+              name: d.Airport_Code,
+              latitude: +d.latitude,
+              longitude: +d.longitude
+           }]
           })
         });
+
+        // d3.json("/Test_Data/airports.json", function(data){
+        //   data.forEach(function (d,i) {
+        //     airport_location[i] = 
+        //     [{
+        //       country: d.country,
+        //       name: d.name,
+        //       latitude:  +d.lat,
+        //       longitude:  +d.lon
+        //     }]
+        //   })
+        // });
 
         var baseTime = Date.now();
         var rotate = [0, -15];
@@ -190,18 +208,10 @@
 
         d3.json("//cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json", function(error, world) {
           if (error) throw error;
-          drawGraticule();
           
-          g.append("circle")
-            .attr("cx", globePositionX)
-            .attr("cy", globePositionY)
-            .attr("r", 300)
-            .style("fill", "none")
-            .style("stroke-width", "0.5px")
-            .style("stroke", "#006994")
+          drawGraticule();
 
-          g.append("g")
-            .selectAll("path")    
+          g.selectAll("path")    
             .data(topojson.feature(world, world.objects.countries).features)
             .enter().append("path")
             .attr("class","countries")
@@ -213,11 +223,15 @@
             .append("title")
             .text(d => d.properties.name + ", " + airports.get(d.id));
 
-          g.append("g").selectAll("path")
-            .data(graticular)
-            .attr("d", path)
-            .style("stroke", "grey")
-            .style("stroke-width", ".5px");
+          g.append("circle")
+            .attr("cx", globePositionX)
+            .attr("cy", globePositionY)
+            .attr("r", 300)
+            .style("fill", "none")
+            .style("stroke-width", "0.3px")
+            .style("stroke", "#006994")
+
+
 
           var legend = d3.legendColor()
               .labelFormat(d3.format(".2f"))
@@ -225,50 +239,34 @@
               .title("A really really really really really long title")
               .titleWidth(100)
               .scale(color);
+              
 
           svg.select(".legendQuant")
             .call(legend);
               startSpin();
-          /*
-          svg.append("g") //add states
-            .selectAll("path")
-            .data(topojson.feature(us, us.objects.states).features)
-            .enter().append("path")
-            .attr("class", "states")
-            .attr("d", path)
-            .on("click", clicked)
-            .on("mouseover", function(d) {d3.select(this).style("opacity", "0")})
-            .on("mouseout", function(d) {d3.select(this).style("opacity", "1")})
-            .append("title")
-            .text(d => d.properties.name); 
-          
-          svg.append("g")
-            .append("path")
-            .attr("class", "state-borders")
-            .attr("d", path(topojson.mesh(us, us.objects.states, function(a, b) { return a !== b; })));
-/*
-          d3.selectAll("path")
-          .on("click", function() {
-            d3.select(this)
-            .attr("class", "selected-state");
-            console.log(this);
-          });*/
+
+              
+          svg.append("path")
+          .datum({type: "LineString", coordinates: [airport_location[0].latitude, airport_location[0].longitude]})
+          .attr("class", "arc")
+          .attr("d", path);
+
         });
 
 
 
-        function drawGraticule() {
-                const graticule = d3.geoGraticule()
-                    .step([10, 10]);
+  function drawGraticule() {
+    const graticule = d3.geoGraticule()
+        .step([10, 10]);
 
-                svg.append("path")
-                    .datum(graticule)
-                    .attr("class", "graticule")
-                    .attr("d", path)
-                    .style("fill", "none")
-                    .style("stroke", "#ccc")
-                    .style("opacity", 0.6);
-            }
+    svg.append("path")
+        .datum(graticule)
+        .attr("class", "graticule")
+        .attr("d", path)
+        .style("fill", "none")
+        .style("stroke", "#ccc")
+        .style("opacity", 0.6);
+  }
 
 
 var timer;
@@ -298,7 +296,7 @@ var timer;
   }
 
   function markLocation() {
-    const markers = g.selectAll("circle")
+    const markers = g.selectAll("circle.marker")
             .data(airport_location);
             markers
             .enter()
@@ -311,13 +309,17 @@ var timer;
             .attr('fill', d => {
                         const coordinate = [d[0].longitude, d[0].latitude];
                         gdistance = d3.geoDistance(coordinate, projection.invert([width/2, height/2]));
-                        return gdistance > 1.4 ? 'none' : 'blue';
+                        return gdistance > 1.5 ? 'none' : 'blue';
                     });
 
 
             g.each(function () {
                     this.parentNode.appendChild(this);
                 });
+  }
+
+  function printStartTimeHTML() {
+    console.log(startTimeHTML);
   }
 
   function stopSpin() {
