@@ -1,101 +1,127 @@
 <!DOCTYPE html>
 <html>
   <head>
-        <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
-        <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
+    
+
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-drag.v1.min.js"></script>
+    <script src="/D3/d3-legend.min.js"></script>
+
+    <link rel="shortcut icon" href="/Test_Data/d3.png" />
   </head>
   <body>
-      <title>D3 Project</title>
+    <title>D3 Project</title>
 
-      <style>
-        #div {
-        position: fixed;
-        left: 0px;
-        right: 0px;
-        top: 0px;
-        bottom: 0px;
+    <style>
+      #div {
+      position: fixed;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      }
+
+      #div.background {
+        background-image: url("/Test_Data/Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.jpg");
+        filter: blur(8px);
         pointer-events: none;
-        }
+      }
 
-        .countries {
-          fill: lightgray;
-        }
+      .countries {
+        fill: lightgray;
+      }
 
-        .graticule {
-          fill: none;   
-          stroke: lightgray;
-          stroke-width: 0.5px;
-          pointer-events: none;
+      .graticule {
+        fill: none;   
+        stroke: lightgray;
+        stroke-width: 0.5px;
+        pointer-events: none;
+      }
 
-        }
+      .marker {
+        pointer-events: none;
+      }
 
-        .marker {
-          pointer-events: none;
-        }
+      .selected-state {
+        fill: blue;
+      }
 
-        .selected-state {
-          fill: blue;
-        }
+      .arc {
+        fill: none;
+        stroke: red;
+        stroke-width: 3px;
+        stroke-linecap: round;
+      }
+    </style>
+      
+    <div id="div" class="background"></div>
+    <div id="div">
+      <svg></svg> 
+    </div>
 
-        .arc {
-          fill: none;
-          stroke: red;
-          stroke-width: 3px;
-          stroke-linecap: round;
-        }
-        </style>
+  <script>
 
-        <div id="div">
-          <svg></svg> 
-        </div>
+// ---------------------------------------------- JS Starts Here -------------------------------------
+    //Establish global variables
+    var  width = 960,
+      height = 500,
+      baseTime = Date.now(),
+      rotate = [0, -15],
+      velocity = [0.25, 0],
+      globePositionX, 
+      globePositionY;
 
+    // Establish constants
+    const LOFT = 1.3; 
 
-        
-        <script src="https://d3js.org/d3.v4.min.js"></script>
-        <script src="https://d3js.org/topojson.v2.min.js"></script>
-        <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-        <script src="https://d3js.org/d3-drag.v1.min.js"></script>
-        <script src="/D3/d3-legend.min.js"></script>
-        <script>
+    // SVG is the container for this visualization
+    const svg = d3.select("svg"),
+      g = svg.append("g"),
+      chartDiv = document.getElementById("div"),
+      graticular = d3.geoGraticule();
+      
+    var color = d3.scalePow().exponent(1/1.5).domain([1,633]).range(["white", "green"]);
 
-        var svg = d3.select("svg");
-          width = 960,
-          height = 500;
+    // Projection used for the map
+    var projection = d3.geoOrthographic()
+      .scale((height-10)/2)
+      .translate([width / 2, height / 2])
+      .precision(0.1)
+      .clipAngle(90);
 
-          
-      svg.call(d3.drag()
-          .on("drag", function() {
-            var rotation = projection.rotate();
+      
+    var liftedProjection = d3.geoOrthographic()
+      .scale(((height-10)/2) * LOFT)
+      .translate([width / 2, height / 2])
+      .precision(0.1)
+      .clipAngle(90);
 
-            projection.rotate([rotation[0] + d3.event.dx * 0.3, rotation[1] - d3.event.dy * 0.3, rotation[2]]);
-            svg.selectAll("path").attr("d", path);
+      
+    var path = d3.geoPath().projection(projection);
 
-            rotate[0] = rotation[0];
-            rotate[1] = rotation[1];
-            markLocation();
-          }))
+    svg.call(d3.drag()
+      .on("drag", function() {
+        stopSpin();
+        var rotation = projection.rotate();
 
+        projection.rotate([rotation[0] + d3.event.dx * 0.3, rotation[1] - d3.event.dy * 0.3, rotation[2]]);
+        svg.selectAll("path").attr("d", path);
 
-        var g = svg.append("g");
-        
-        var globePositionX, globePositionY;
+        rotate[0] = rotation[0];
+        rotate[1] = rotation[1];
+        markLocation();
+      })
+    );
 
-        var chartDiv = document.getElementById("div");
+    redraw();
 
-        var projection = d3.geoOrthographic()
-            .scale(300)
-            .translate([width / 2, height / 2])
-            .precision(0.1)
-            .clipAngle(90);
-            
-        redraw();
-
-        var path = d3.geoPath().projection(projection);
-
-        var color = d3.scalePow().exponent(1/1.5).domain([1,633]).range(["white", "green"]);
-        var graticular = d3.geoGraticule();
-        var airport_location = [];
+    var airport_location = [];
 /*
         d3.csv("/Test_Data/airports_edit.csv", function(data) {
           data.forEach(function (d,i) {
@@ -113,183 +139,171 @@
         }); */
 
 
-        var airports = new Map();
+    var airports = new Map();
 
-        d3.csv("/Test_Data/Number_of_airports.csv", function(data){
-          data.forEach(function(d,i) {
-            airports.set(d.ID_number, d.Airports)
-          });
-        });
+    d3.csv("/Test_Data/Number_of_airports.csv", function(data){
+      data.forEach(function(d,i) {
+        airports.set(d.ID_number, d.Airports)
+      });
+    });
 
         
-        d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
-          data.forEach(function(d,i) {
-            airport_location[i] = 
-            [{
-              name: d.Airport_Code,
-              latitude: +d.latitude,
-              longitude: +d.longitude
-           }]
-          })
-        });
+    d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
+      data.forEach(function(d,i) {
+        airport_location[i] = 
+        [{
+          name: d.Airport_Code,
+          latitude: +d.latitude,
+          longitude: +d.longitude
+        }]
+      })
+    });
+        
 
-        // d3.json("/Test_Data/airports.json", function(data){
-        //   data.forEach(function (d,i) {
-        //     airport_location[i] = 
-        //     [{
-        //       country: d.country,
-        //       name: d.name,
-        //       latitude:  +d.lat,
-        //       longitude:  +d.lon
-        //     }]
-        //   })
-        // });
+    window.addEventListener("resize", redraw);
+    var spinning = true;
 
-        var baseTime = Date.now();
-        var rotate = [0, -15];
-        var velocity = [0.25, 0];
+    function redraw() {
+      width = chartDiv.clientWidth;
+      height = chartDiv.clientHeight;
 
-        window.addEventListener("resize", redraw);
-        var spinning = true;
+      globePositionX = width * (1/2);
+      globePositionY = height * (1/2);
 
-        function redraw() {
-          width = chartDiv.clientWidth;
-          height = chartDiv.clientHeight;
+      // Use the extracted size to set the size of an SVG element.
+      svg
+        .attr("width", width)
+        .attr("height", height);  
 
-          globePositionX = width * (1/2);
-          globePositionY = height * (1/2);
+      projection
+        .scale(300)
+        .translate([globePositionX, globePositionY])
+        .precision(0.1)
+        .clipAngle(90);
+      
+      svg.selectAll("circle")
+        .attr("cx", globePositionX)
+        .attr("cy", globePositionY)
 
-          // Use the extracted size to set the size of an SVG element.
-          svg
-            .attr("width", width)
-            .attr("height", height);  
+      svg.selectAll("path").attr("d", path);
 
-          projection
-            .scale(300)
-            .translate([globePositionX, globePositionY])
-            .precision(0.1)
-            .clipAngle(90);
-          
-          svg.selectAll("circle")
-            .attr("cx", globePositionX)
-            .attr("cy", globePositionY)
+    }
 
-          svg.selectAll("path").attr("d", path);
-
-        }
-
-        svg.on("dblclick", function() {
-            if (spinning) {
-              stopSpin();
-            } else {
-              startSpin();
-            }
-          });
-
-        d3.json("//cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json", function(error, world) {
-          if (error) throw error;
-            
-          drawGraticule();
-          
-          g.append("circle")
-            .attr("cx", globePositionX)
-            .attr("cy", globePositionY)
-            .attr("r", 300)
-            .style("fill", "none")
-            .style("stroke-width", "0.3px")
-            .style("stroke", "#006994");
-
-
-          g.selectAll("path")    
-            .data(topojson.feature(world, world.objects.countries).features)
-            .enter().append("path")
-            .attr("class","countries")
-            .attr("d", path)
-            .style("fill", d => color(airports.get(d.id)))
-            .style("opacity", "1")
-            .style("stroke", "#006994")
-            .style("stroke-width", "0.75px")
-            .append("title")
-            .text(d => d.properties.name + ", " + airports.get(d.id));
-
+    svg.on("dblclick", function() {
+        if (spinning) {
+          stopSpin();
+        } else {
           startSpin();
+        }
+      });
+
+    d3.json("//cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json", function(error, world) {
+      if (error) throw error;
+
+      g.append("circle")
+        .attr("cx", globePositionX)
+        .attr("cy", globePositionY)
+        .attr("r", 300)
+        .style("fill", "white")
+        .style("stroke-width", "0.3px")
+        .style("stroke", "#006994")
+        .style("pointer-events", "none");
 
 
-        });
+      g.selectAll("path")    
+        .data(topojson.feature(world, world.objects.countries).features)
+        .enter().append("path")
+        .attr("class","countries")
+        .attr("d", path)
+        .style("fill", d => color(airports.get(d.id)))
+        .style("opacity", "1")
+        .style("stroke", "#006994")
+        .style("stroke-width", "0.75px")
+        .append("title")
+        .text(d => d.properties.name + ", " + airports.get(d.id));
+
+      startSpin();
+      drawGraticule();
+
+
+    });
 
 
 
-  function drawGraticule() {
-    const graticule = d3.geoGraticule()
+    function drawGraticule() {
+      let graticule = d3.geoGraticule()
         .step([10, 10]);
 
-    g.append("path")
-        .datum(graticule)
+      g.append("path")
+        .datum(graticule) 
         .attr("class", "graticule")
         .attr("d", path)
         .style("fill", "none")
-        .style("stroke", "#ccc")
+        .style("stroke", "lightgray")
         .style("opacity", 0.6);
-  }
+
+    }
 
 
-var timer;
+    var timer;
 
-  function startSpin() { 
-    
-    currentTime =  
-
-    timer = d3.timer(function() {
-      var dt = Date.now() - baseTime;
-      currentTime = Date.now();
-
-      spinning = true;
-
-      rotate[0] += (velocity[0])
-      rotate[1] += (velocity[1])
-
-      rotate[0] = rotate[0] %360;
-      rotate[1] = rotate[1] %360;
+    function startSpin() { 
       
-      projection.rotate([rotate[0], rotate[1]]);    
+      currentTime =  
 
-      svg.selectAll("path").attr("d", path);
-     markLocation();
+      timer = d3.timer(function() {
+        var dt = Date.now() - baseTime;
+        currentTime = Date.now();
 
-    });
-  }
+        spinning = true;
 
-  function markLocation() {
-    const markers = g.selectAll("circle.marker")
-            .data(airport_location);
-            markers
-            .enter()
-            .append("circle")
-            .attr("class", "marker")
-            .merge(markers)
-            .attr("cx", d => projection([d[0].longitude, d[0].latitude])[0])
-            .attr("cy", d => projection([d[0].longitude, d[0].latitude])[1])
-            .attr("r", 2)
-            .attr('fill', d => {
-                        const coordinate = [d[0].longitude, d[0].latitude];
-                        gdistance = d3.geoDistance(coordinate, projection.invert([width/2, height/2]));
-                        return gdistance > 1.5 ? 'none' : 'blue';
-                    });
+        rotate[0] += (velocity[0])
+        rotate[1] += (velocity[1])
+
+        rotate[0] = rotate[0] %360;
+        rotate[1] = rotate[1] %360;
+        
+        projection.rotate([rotate[0], rotate[1]]);    
+
+        svg.selectAll("path").attr("d", path);
+        markLocation();
+
+      });
+    }
 
 
-            g.each(function () {
-                    this.parentNode.appendChild(this);
-                });
-  }
+    function markLocation() {
+      const markers = g.selectAll("circle.marker")
+        .data(airport_location);
 
-  function stopSpin() {
-    timer.stop(); 
+      markers.enter()
+        .append("circle")
+        .attr("class", "marker")
+        .merge(markers)
+        .attr("cx", d => projection([d[0].longitude, d[0].latitude])[0])
+        .attr("cy", d => projection([d[0].longitude, d[0].latitude])[1])
+        .attr("r", 2)
+        .attr('fill', d => {
+            const coordinate = [d[0].longitude, d[0].latitude];
 
-    spinning = false;
-    stoppedTime = Date.now();
-}
+            gdistance = d3.geoDistance(coordinate, projection.invert([width/2, height/2]));
 
-        </script>
-    <p></p>
+            return gdistance > 1.5 ? 'none' : 'blue';
+        });
+
+
+        g.each(function () {
+          this.parentNode.appendChild(this);
+        });
+      }
+
+    function stopSpin() {
+      timer.stop(); 
+
+      spinning = false;
+      stoppedTime = Date.now();
+    }
+
+  </script>
   </body>
 </html>
