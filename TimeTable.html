@@ -19,6 +19,9 @@
     <title>D3 Project</title>
 
     <style>
+      body{
+        margin:25px;
+      }
       #div {
       position: fixed;
       left: 0px;
@@ -39,13 +42,15 @@
       .sideMenu {  
         height: 100%;
         width: 200px;
-        position: fixed;
+        border: 10px;
         z-index: 1;
         top: 0;
         left: 0;
-        fill: #111;
+        /* background-color: #0070BB; */
         overflow-x: hidden;
         padding-left: 10px;
+        background-position: left 10px;
+        position:fixed;
       }
 
       .graticule {
@@ -72,9 +77,12 @@
     </style>
       
     <div id="div" class="background"></div>
-    <div class="sideMenu">
-    </div>
     <div id="div">
+      <form class="sideMenu" name="myform" onSubmit="return handleClick()">
+        <input type="text" placeholder="Airport Code" >
+      </form>
+    </div>
+    <div id="ListContainer">
       <svg>
       </svg> 
     </div>
@@ -89,9 +97,10 @@
 
     var airport_location = [],
     airports = new Map(),
-    svg = d3.select("svg").attr("width", width).attr("height", height);
-    menuContiner = d3.select(".sideMenu");
-    windowDiv = document.getElementById("div");
+    svg = d3.select("svg").attr("width", width).attr("height", height),
+    menuContiner = d3.select(".sideMenu"),
+    windowDiv = document.getElementById("div"),
+    airportContainer = svg.append("g");
 /*
         d3.csv("/Test_Data/airports_edit.csv", function(data) {
           data.forEach(function (d,i) {
@@ -108,13 +117,6 @@
           })
         }); */
 
-
-    d3.csv("/Test_Data/Number_of_airports.csv", function(data){
-      data.forEach(function(d,i) {
-        airports.set(d.ID_number, d.Airports)
-      });
-    });
-
         
     d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
       data.forEach(function(d,i) {
@@ -125,13 +127,14 @@
           longitude: +d.longitude
         }]
       })
-
       
-    svg.append("g").selectAll("text")
+      var yOffset = 0;
+      
+    airportContainer.selectAll("text")
     .data(airport_location).enter()
     .append("text")
     .attr("x", width/2)
-    .attr("y", height/2)
+    .attr("y", (yOffset++ + 30))
     .text(d => d[0].name);
     });
     
@@ -139,16 +142,20 @@
 
     window.addEventListener("resize", resize);
 
-    var menuSVG = menuContiner.style("width", width/4 + 'px').style("height", height)
+    menuContiner.attr("transform", "translate(10px,10px)")
+
+    menuContiner.style("width", width/4 + 'px').style("height", height)
       // .style("background-color", "blue")
       .style("opacity", "0.6")
-      .style("padding-top", "10px")
-      .append("svg").attr("class","menu")
+      .style("margin", height *0.025 + 'px')
       .style("background", "#0070BB")
-      .style("width", "100%")
+      .style("width", width*(1/5) + 'px')
+      .style("fill", "blue")
       .style("height", "95%");
     
-    var firstInput = menuSVG.append("input")
+    var firstInput = d3.select("input")
+      .style("width", menuContiner.width)
+      .style("margin", "10px")
       .attr("type", "text")
       .attr("x", 100 + 'px')
       .attr("y", 100 + "px")
@@ -159,7 +166,12 @@
         width = windowDiv.clientWidth;
         height = windowDiv.clientHeight;
 
-        menuContiner.style("width", width/4 + 'px').style("height", height + 'px');
+        menuContiner.style("width", width/5 + 'px').style("height", height *0.95+ 'px');
+        d3.select("input").style("width", (width/5) -(height *0.05) + "px");
+    }
+
+    function airportDetails() {
+
     }
 
   </script>
