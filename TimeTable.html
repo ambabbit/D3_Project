@@ -79,7 +79,7 @@
     <div id="div" class="background"></div>
     <div id="div">
       <form class="sideMenu" name="myform" onSubmit="return handleClick()">
-        <input type="text" placeholder="Airport Code" >
+        <input type="text" placeholder="Airport Code" style="text-align: center" >
       </form>
     </div>
     <div id="ListContainer">
@@ -138,8 +138,6 @@
     .text(d => d[0].name);
     });
     
-    resize();
-
     window.addEventListener("resize", resize);
 
     menuContiner.attr("transform", "translate(10px,10px)")
@@ -160,6 +158,9 @@
       .attr("x", 100 + 'px')
       .attr("y", 100 + "px")
       .style("fill", "black");
+
+
+      resize();
 
 
     function resize() {
