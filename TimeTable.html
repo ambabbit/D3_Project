@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
+    
+
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-drag.v1.min.js"></script>
+    <script src="/D3/d3-legend.min.js"></script>
+
+    <link rel="shortcut icon" href="/Test_Data/d3.png" />
+  </head>
+  <body>
+    <title>D3 Project</title>
+
+    <style>
+      #div {
+      position: fixed;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      }
+
+      #div.background {
+        background-image: url("/Test_Data/Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.jpg");
+        filter: blur(8px);
+        pointer-events: none;
+      }
+      .menu {
+        padding-top: 10px;
+      }
+
+      .sideMenu {  
+        height: 100%;
+        width: 200px;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        fill: #111;
+        overflow-x: hidden;
+        padding-left: 10px;
+      }
+
+      .graticule {
+        fill: none;   
+        stroke: lightgray;
+        stroke-width: 0.5px;
+        pointer-events: none;
+      }
+
+      .marker {
+        pointer-events: none;
+      }
+
+      .selected-state {
+        fill: blue;
+      }
+
+      .arc {
+        fill: none;
+        stroke: red;
+        stroke-width: 3px;
+        stroke-linecap: round;
+      }
+    </style>
+      
+    <div id="div" class="background"></div>
+    <div class="sideMenu">
+    </div>
+    <div id="div">
+      <svg>
+      </svg> 
+    </div>
+
+  <script>
+
+// ---------------------------------------------- JS Starts Here -------------------------------------
+    //Establish global variables
+    var  width = 960,
+      height = 500;
+
+
+    var airport_location = [],
+    airports = new Map(),
+    svg = d3.select("svg").attr("width", width).attr("height", height);
+    menuContiner = d3.select(".sideMenu");
+    windowDiv = document.getElementById("div");
+/*
+        d3.csv("/Test_Data/airports_edit.csv", function(data) {
+          data.forEach(function (d,i) {
+            airport_location[i] = 
+            [{
+              iata: d.iata,
+              name: d.name,
+              city:  d.city,
+              state:  d.state,
+              country:  d.country,
+              latitude:  +d.latitude,
+              longitude:  +d.longitude
+            }]
+          })
+        }); */
+
+
+    d3.csv("/Test_Data/Number_of_airports.csv", function(data){
+      data.forEach(function(d,i) {
+        airports.set(d.ID_number, d.Airports)
+      });
+    });
+
+        
+    d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
+      data.forEach(function(d,i) {
+        airport_location[i] = 
+        [{
+          name: d.Airport_Code,
+          latitude: +d.latitude,
+          longitude: +d.longitude
+        }]
+      })
+
+      
+    svg.append("g").selectAll("text")
+    .data(airport_location).enter()
+    .append("text")
+    .attr("x", width/2)
+    .attr("y", height/2)
+    .text(d => d[0].name);
+    });
+    
+    resize();
+
+    window.addEventListener("resize", resize);
+
+    var menuSVG = menuContiner.style("width", width/4 + 'px').style("height", height)
+      // .style("background-color", "blue")
+      .style("opacity", "0.6")
+      .style("padding-top", "10px")
+      .append("svg").attr("class","menu")
+      .style("background", "#0070BB")
+      .style("width", "100%")
+      .style("height", "95%");
+    
+    var firstInput = menuSVG.append("input")
+      .attr("type", "text")
+      .attr("x", 100 + 'px')
+      .attr("y", 100 + "px")
+      .style("fill", "black");
+
+
+    function resize() {
+        width = windowDiv.clientWidth;
+        height = windowDiv.clientHeight;
+
+        menuContiner.style("width", width/4 + 'px').style("height", height + 'px');
+    }
+
+  </script>
+  </body>
+</html>
