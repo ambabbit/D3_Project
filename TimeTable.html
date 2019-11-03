@@ -3,84 +3,35 @@
   <head>
     <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
-    
-
-    
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <script src="https://d3js.org/topojson.v2.min.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/d3-drag.v1.min.js"></script>
-    <script src="/D3/d3-legend.min.js"></script>
+   <link rel="stylesheet" href="./Style.css">
 
     <link rel="shortcut icon" href="/Test_Data/d3.png" />
   </head>
+
+
+
+
   <body>
     <title>D3 Project</title>
 
-    <style>
-      body{
-        margin:25px;
-      }
-      #div {
-      position: fixed;
-      left: 0px;
-      right: 0px;
-      top: 0px;
-      bottom: 0px;
-      }
-
-      #div.background {
-        background-image: url("/Test_Data/Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.jpg");
-        filter: blur(8px);
-        pointer-events: none;
-      }
-      .menu {
-        padding-top: 10px;
-      }
-
-      .sideMenu {  
-        height: 100%;
-        width: 200px;
-        border: 10px;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        /* background-color: #0070BB; */
-        overflow-x: hidden;
-        padding-left: 10px;
-        background-position: left 10px;
-        position:fixed;
-      }
-
-      .graticule {
-        fill: none;   
-        stroke: lightgray;
-        stroke-width: 0.5px;
-        pointer-events: none;
-      }
-
-      .marker {
-        pointer-events: none;
-      }
-
-      .selected-state {
-        fill: blue;
-      }
-
-      .arc {
-        fill: none;
-        stroke: red;
-        stroke-width: 3px;
-        stroke-linecap: round;
-      }
-    </style>
-      
     <div id="div" class="background"></div>
     <div id="div">
-      <form class="sideMenu" name="myform" onSubmit="return handleClick()">
-        <input type="text" placeholder="Airport Code" style="text-align: center" >
-      </form>
+      <div class="sideMenu">
+        <div class="input-form">
+            <input class="input-field" name="airportCode" type="text" autocomplete="off" required >
+              
+            <label for="airportCode" class="field-label">
+              <span class="field-content">Airport Code</span>
+            </label>
+
+            <input class="input-field" name="airportCountry" type="text" autocomplete="off" required >
+              
+            <label for="airportCountry" class="field-label">
+              <span class="field-content">Airport Country</span>
+            </label>
+
+        </div>
+      </div>
     </div>
     <div id="ListContainer">
       <svg>
@@ -101,21 +52,6 @@
     menuContiner = d3.select(".sideMenu"),
     windowDiv = document.getElementById("div"),
     airportContainer = svg.append("g");
-/*
-        d3.csv("/Test_Data/airports_edit.csv", function(data) {
-          data.forEach(function (d,i) {
-            airport_location[i] = 
-            [{
-              iata: d.iata,
-              name: d.name,
-              city:  d.city,
-              state:  d.state,
-              country:  d.country,
-              latitude:  +d.latitude,
-              longitude:  +d.longitude
-            }]
-          })
-        }); */
 
         
     d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
@@ -142,38 +78,13 @@
 
     menuContiner.attr("transform", "translate(10px,10px)")
 
-    menuContiner.style("width", width/4 + 'px').style("height", height)
-      // .style("background-color", "blue")
-      .style("opacity", "0.6")
-      .style("margin", height *0.025 + 'px')
-      .style("background", "#0070BB")
-      .style("width", width*(1/5) + 'px')
-      .style("fill", "blue")
-      .style("height", "95%");
-    
-    var firstInput = d3.select("input")
-      .style("width", menuContiner.width)
-      .style("margin", "10px")
-      .attr("type", "text")
-      .attr("x", 100 + 'px')
-      .attr("y", 100 + "px")
-      .style("fill", "black");
-
-
-      resize();
-
-
-    function resize() {
+    /*function resize() {
         width = windowDiv.clientWidth;
         height = windowDiv.clientHeight;
 
         menuContiner.style("width", width/5 + 'px').style("height", height *0.95+ 'px');
         d3.select("input").style("width", (width/5) -(height *0.05) + "px");
-    }
-
-    function airportDetails() {
-
-    }
+    }*/
 
   </script>
   </body>
