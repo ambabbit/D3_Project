@@ -1,0 +1,97 @@
+
+body{
+    /* margin:25px; */
+    font-family: serif;
+  }
+
+#div {
+    position: fixed;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+}
+
+#div.background {
+    background-image: url("/Test_Data/Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.jpg");
+    filter: blur(8px);
+    pointer-events: none;
+}
+
+.sideMenu {  
+    position: relative;
+    height: 95%;
+    width: 20%;
+    background-color: #0070BB;
+    opacity: 0.7;
+    top: 2.5%;
+    left: 2.5%;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.input-field {
+    position: relative;
+    top: 2%;
+    height: 20px;
+    width: 90%;
+    background: none;
+}
+
+.input-form {
+    position: relative;
+    top: 2%;
+    height: 50px;
+    width: 90%;
+    overflow: hidden;
+}
+.input-form input {
+    width: 100%;
+    height: 100%;
+    color: grey;
+    border: none;
+    padding-top: 5px;
+    outline: none;
+}
+
+.input-form label {
+    position: relative;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    border-bottom: 1px solid black;
+}
+
+.input-form label::after {
+    content: "";
+    position: absolute;
+    left: 0px;
+    bottom: -1px;
+    height: 100%;
+    width: 100%;
+    border-bottom: 3px solid blue;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+}
+
+.field-content {
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    transition: all 0.3s ease;
+}
+
+.input-form input:focus  + .field-label .field-content, 
+.input-form input:valid + .field-label .field-content {
+    transform: translateY(-150%);
+    color:darkblue;
+}
+
+.input-form input:focus + .field-label::after, .input-form input:valid + .field-label::after {
+    transform: translateX(0%);
+}
