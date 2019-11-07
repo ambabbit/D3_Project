@@ -1,13 +1,12 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: #E0F2F7;
+  background-color: lightcyan;
 }
 
 .header {
   text-align: center;
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-  
 }
 
 * {
@@ -25,6 +24,11 @@ html, body {
   padding: 10px;
   height: 100vh;
   border: solid black;
+  background-color: white;
+  background-image: url("Globe.PNG");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
 }
 
 .model2 {
