@@ -3,6 +3,7 @@
   <head>
     <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
     <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
+<<<<<<< HEAD
     <script src="https://d3js.org/queue.v1.min.js"></script>
    <link rel="stylesheet" href="./Style.css">
     <script type="text/javascript" src="./Scripts.js"> </script>
@@ -16,10 +17,24 @@
   <body>
     <title>D3 Project</title>
 
+=======
+   <link rel="stylesheet" href="./Style.css">
+
+    <link rel="shortcut icon" href="/Test_Data/d3.png" />
+  </head>
+
+
+
+
+  <body>
+    <title>D3 Project</title>
+
+>>>>>>> 2a9f1bb7eed5a6ff7dd184984afb0636efeadb5d
     <div id="div" class="background"></div>
     <div id="div">
       <div class="sideMenu">
         <div class="input-form">
+<<<<<<< HEAD
           <input class="input-field" name="airportCode" type="text" autocomplete="off" required >
           <label for="airportCode" class="field-label">
             <span class="field-content">Airport Code</span>
@@ -30,6 +45,19 @@
           <label for="airportCountry" class="field-label">
             <span class="field-content">Airport Country</span>
           </label>
+=======
+            <input class="input-field" name="airportCode" type="text" autocomplete="off" required >
+              
+            <label for="airportCode" class="field-label">
+              <span class="field-content">Airport Code</span>
+            </label>
+
+            <input class="input-field" name="airportCountry" type="text" autocomplete="off" required >
+              
+            <label for="airportCountry" class="field-label">
+              <span class="field-content">Airport Country</span>
+            </label>
+>>>>>>> 2a9f1bb7eed5a6ff7dd184984afb0636efeadb5d
 
         </div>
       </div>
@@ -53,10 +81,39 @@
     menuContiner = d3.select(".sideMenu"),
     windowDiv = document.getElementById("div"),
     airportContainer = svg.append("g");
+<<<<<<< HEAD
     svg.style("background", "black")
     
     const fill = FilterBasedOnAirportCode("DCA");
     
+=======
+
+        
+    d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
+      data.forEach(function(d,i) {
+        airport_location[i] = 
+        [{
+          name: d.Airport_Code,
+          latitude: +d.latitude,
+          longitude: +d.longitude
+        }]
+      })
+      
+      var yOffset = 0;
+      
+    airportContainer.selectAll("text")
+    .data(airport_location).enter()
+    .append("text")
+    .attr("x", width/2)
+    .attr("y", (yOffset++ + 30))
+    .text(d => d[0].name);
+    });
+    
+    window.addEventListener("resize", resize);
+
+    menuContiner.attr("transform", "translate(10px,10px)")
+
+>>>>>>> 2a9f1bb7eed5a6ff7dd184984afb0636efeadb5d
     /*function resize() {
         width = windowDiv.clientWidth;
         height = windowDiv.clientHeight;
