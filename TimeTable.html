@@ -64,16 +64,16 @@
       makeParagraph() 
     }
 
-    async function makeParagraph() {
+    function makeParagraph() {
 
       svg.style("overflow", "scroll")
       d3.select(".ListContainer").selectAll("svg").remove()
 
-      let containers = d3.select(".ListContainer").selectAll("svg").data(await fill).enter().append("svg")
+      let containers = d3.select(".ListContainer").selectAll("svg").data(fill).enter().append("svg")
       .style("position", "relative")
       .style("background", "#91A3B0")
       .style("opacity", "0.9")
-      .attr("width", "300px")
+      .attr("width", "40%")
       .attr("height", "90%")
       .style("margin", "5px")
       .append("text").text(d=>d)
