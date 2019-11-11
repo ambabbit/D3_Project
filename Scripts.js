@@ -1,10 +1,20 @@
 
 
+var airportSchedule1 = [];
+var airportSchedule2 = [];
 var airportSchedule = [];
-airportSchedule = d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019 Yes CodeShare.csv");
 
-function FindAllRelatedAirports(s) {
-    const airSchedule = airportSchedule,
+pullData();
+
+async function pullData() {
+    airportSchedule1 = await d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019 Yes CodeShare.csv");
+    airportSchedule2 = await d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019_No Codeshare.csv")
+    
+    airportSchedule = airportSchedule1.concat(airportSchedule2);
+}
+
+async function FindAllRelatedAirports(s) {
+    const airSchedule = await airportSchedule,
     match = new Set(),
     test = [];
    

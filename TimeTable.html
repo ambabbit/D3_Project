@@ -68,16 +68,22 @@
     function makeParagraph() {
 
       svg.style("overflow", "scroll")
-      d3.select(".ListContainer").selectAll("svg").remove()
+      d3.select(".ListContainer").selectAll("svg").remove();
+
+      let graphHeight = height*(5/6);
+      let graphWidth = width/4
+
+      let y = d3.scaleLinear().domain([0,24]).range([0,graphHeight]);
+      let x = d3.scaleLinear().domain([0,1]).range([0,graphWidth/4])
 
       let containers = d3.select(".ListContainer").selectAll("svg").data(fill).enter().append("svg")
       .style("position", "relative")
       .style("background", "#91A3B0")
       .style("opacity", "0.8")
-      .attr("width", "40%")
-      .attr("height", "90%")
-      .style("margin", "5px")
-      .append("text").text(d => {if (d != "  ") {return "Terminal " + d} else {return "Airport"}})
+      .attr("width", "300px")
+      .attr("height", "500px")
+      .style("margin", "5px");
+      containers.append("text").text(d => {if (d != "  ") {return "Terminal " + d} else {return "Airport"}})
       .style("font-family", "serif")
       .style("font-size", "20px")
       .style("fill", "white")
@@ -86,10 +92,16 @@
       .attr("y", "10%")
       .style("dominant-baseline", "middle")
       .style("text-anchor", "middle");
+      console.log(containers);
 
-      containers.append("svg") 
-      .style("position", "relative")
-      .text(d=>console.log(currentAirport + ", " + d));
+      graphWidth = containers.node().getBoundingClientRect().width-50;
+      x.range([0,graphWidth]);
+
+      let charts = containers.append("svg").style("background", "white");
+      charts.append("g").style("transform", "translate(10%,14.7%)").call(d3.axisLeft(y));
+      charts.append("g").style("transform", "translate(10%,98%)").call(d3.axisBottom(x).tickFormat(""))
+      
+
     }
 
     function sectionTitle(data) {
