@@ -1,0 +1,157 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: lightcyan;
+}
+
+.header {
+  text-align: center;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.display-container .content .wide {
+  max-width: 1500px;
+}
+
+.model1 {
+  float: left;
+  position: relative;
+  width: 33%;
+  padding: 10px;
+  height: 100vh;
+  border: solid black;
+  background-color: white;
+  background-image: url("Globe.PNG");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.model2 {
+  float: left;
+  position: relative;
+  width: 33%;
+  padding: 10px;
+  height: 100vh;
+  border: solid black;
+  ;
+}
+
+.model3 {
+  float: left;
+  position: relative;
+  width: 33%;
+  padding: 10px;
+  height: 100vh;
+  border: solid black;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media only screen and (max-width: 600px) {
+  .model1 {
+    display: block;
+    width: auto;
+  }
+
+  .model2 {
+    display: block;
+    width: auto;
+  }
+
+  .model3 {
+    display: block;
+    width: auto;
+  }
+}
+
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0);
+  transition: background-color 0.5s ease;
+}
+
+.model1:hover .overlay {
+  display: block;
+  background: rgba(0, 0, 0, .3);
+}
+
+.model2:hover .overlay {
+  display: block;
+  background: rgba(0, 0, 0, .3);
+}
+
+.model3:hover .overlay {
+  display: block;
+  background: rgba(0, 0, 0, .3);
+}
+
+.title {
+  position: absolute;
+  width: 500px;
+  left: 0;
+  top: 400px;
+  font-weight: 700;
+  font-size: 30px;
+  text-align: center;
+  text-transform: uppercase;
+  color: black;
+  z-index: 1;
+  transition: top .5s ease;
+}
+
+.model1:hover  .title {
+  top: 230px;
+}
+
+.model2:hover  .title {
+  top: 230px;
+}
+
+.model3:hover  .title {
+  top: 230px;
+}
+
+.ghost-button {
+  position: absolute;
+  width: 500px;
+  left:0;
+  top: 400px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+.ghost-button a {
+  width: 200px;
+  padding: 12px 48px;
+  text-align: center;
+  color: black;
+  border: solid 2px black;
+  z-index: 1;
+}
+
+.model1:hover .ghost-button {
+  opacity: 1;
+}
+
+.model2:hover .ghost-button {
+  opacity: 1;
+}
+
+.model3:hover .ghost-button {
+  opacity: 1;
+}
