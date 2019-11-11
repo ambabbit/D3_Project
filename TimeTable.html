@@ -56,10 +56,11 @@
     
     let baseHeight = 0;
     let fill = [];  
+    let currentAirport;
 
     async function update() {
-      let code = document.getElementById("code").value
-      fill = await FindAllRelatedAirports(code);
+      currentAirport = document.getElementById("code").value
+      fill = await FindAllRelatedAirports(currentAirport);
       fill.sort();
       makeParagraph() 
     }
@@ -72,20 +73,28 @@
       let containers = d3.select(".ListContainer").selectAll("svg").data(fill).enter().append("svg")
       .style("position", "relative")
       .style("background", "#91A3B0")
-      .style("opacity", "0.9")
+      .style("opacity", "0.8")
       .attr("width", "40%")
       .attr("height", "90%")
       .style("margin", "5px")
-      .append("text").text(d=>d)
+      .append("text").text(d => {if (d != "  ") {return "Terminal " + d} else {return "Airport"}})
       .style("font-family", "serif")
       .style("font-size", "20px")
       .style("fill", "white")
       .style("text-shadow", "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000")
       .attr("x", "50%")
-      .attr("y", "20");
+      .attr("y", "10%")
+      .style("dominant-baseline", "middle")
+      .style("text-anchor", "middle");
 
       containers.append("svg") 
-      .style("position", "relative");
+      .style("position", "relative")
+      .text(d=>console.log(currentAirport + ", " + d));
+    }
+
+    function sectionTitle(data) {
+      let title = new String;
+      console.log(data);
     }
 
 

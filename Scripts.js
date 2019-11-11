@@ -3,8 +3,8 @@
 var airportSchedule = [];
 airportSchedule = d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019 Yes CodeShare.csv");
 
-async function FindAllRelatedAirports(s) {
-    const airSchedule = await airportSchedule,
+function FindAllRelatedAirports(s) {
+    const airSchedule = airportSchedule,
     match = new Set(),
     test = [];
    
@@ -26,6 +26,9 @@ async function FindAllRelatedAirports(s) {
     return test;
 }
 
+async function CollectAllTimes(TerminalName) {
+
+}
 
 
 
