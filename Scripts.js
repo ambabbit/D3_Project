@@ -3,28 +3,27 @@
 var airportSchedule = [];
 airportSchedule = d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019 Yes CodeShare.csv");
 
-async function FilterBasedOnAirportCode(s) {
+async function FindAllRelatedAirports(s) {
     const airSchedule = await airportSchedule,
-    match = [];
-
-    let offset = 0;
+    match = new Set(),
+    test = [];
    
     const results = airSchedule.filter(airport => airport["Origin Airport"] == s || airport["Destination Airport"] == s)
    
     results.forEach(function (d){
-        match[offset++] = {
-            Origin_Airport: d["Origin Airport"],
-            Destination_Airport: d["Destination Airport"],
-            Arrival_Terminal: d["Arrival Terminal"],
-            Departure_Terminal: d["Departure Terminal"],
-            Departure_Time: d["Departure Time"],
-            Arrival_Time: d["Arrival Time"] 
+        if (d["Origin Airport"] != s) {
+            match.add(d["Arrival Terminal"]);   
+        } else if (d["Destination Airport"] != s) {
+            match.add(d["Departure Terminal"]);
         }
     });
+    let count = 0; 
+    match.forEach(function(d,i) {test[count++] = d})
 
+    console.log(test);
     console.log(match);
 
-    return match;
+    return test;
 }
 
 

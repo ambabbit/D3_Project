@@ -17,9 +17,9 @@
 
     <div id="div" class="background"></div>
     <div id="div">
-      <div class="sideMenu">
-        <div class="input-form">
-            <input class="input-field" name="airportCode" type="text" autocomplete="off" required >
+      <div class="sideMenu" style="display:flexbox">
+        <div class="input">
+            <input id="code"class="input-field" name="airportCode" type="text" autocomplete="off" required >
               
             <label for="airportCode" class="field-label">
               <span class="field-content">Airport Code</span>
@@ -31,12 +31,12 @@
               <span class="field-content">Airport Country</span>
             </label>
 
-        </div>
+            <button onclick="update()">Submit</button>  
+
+          </div>
       </div>
-    </div>
-    <div id="ListContainer">
-      <svg>
-      </svg> 
+      <div class="ListContainer">
+      </div>
     </div>
 
   <script>
@@ -49,13 +49,50 @@
 
     var airport_location = [],
     airports = new Map(),
-    svg = d3.select("svg").attr("width", width).attr("height", height),
+    svg = d3.select(".ListContainer"),
     menuContiner = d3.select(".sideMenu"),
     windowDiv = document.getElementById("div"),
-    airportContainer = svg.append("g");
+    count = 0;
     
-    const fill = FilterBasedOnAirportCode("DCA");
-    
+    let baseHeight = 0;
+    let fill = [];  
+
+    async function update() {
+      let code = document.getElementById("code").value
+      fill = await FindAllRelatedAirports(code);
+      fill.sort();
+      makeParagraph() 
+    }
+
+    async function makeParagraph() {
+
+      svg.style("overflow", "scroll")
+      d3.select(".ListContainer").selectAll("svg").remove()
+
+      let containers = d3.select(".ListContainer").selectAll("svg").data(await fill).enter().append("svg")
+      .style("position", "relative")
+      .style("background", "#91A3B0")
+      .style("opacity", "0.9")
+      .attr("width", "300px")
+      .attr("height", "90%")
+      .style("margin", "5px")
+      .append("text").text(d=>d)
+      .style("font-family", "serif")
+      .style("font-size", "20px")
+      .style("fill", "white")
+      .style("text-shadow", "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000")
+      .attr("x", "50%")
+      .attr("y", "20");
+
+      containers.append("svg") 
+      .style("position", "relative");
+    }
+
+
+    function incrementHeight() {
+      baseHeight += 70;
+      return baseHeight;
+    }
     /*function resize() {
         width = windowDiv.clientWidth;
         height = windowDiv.clientHeight;
