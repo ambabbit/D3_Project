@@ -1,7 +1,7 @@
 html, body {
   margin: 0;
   padding: 0;
-  background-color: lightcyan;
+  background-image: url("/Test_Data/Appearance_of_sky_for_weather_forecast,_Dhaka,_Bangladesh.jpg");
 }
 
 .header {
@@ -9,127 +9,73 @@ html, body {
   font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
-* {
+html {
   box-sizing: border-box;
 }
-
-.display-container .content .wide {
-  max-width: 1500px;
-}
-
-.model1 {
-  float: left;
-  position: relative;
-  width: 33%;
-  padding: 10px;
-  height: 100vh;
-  border: solid black;
-  background-color: white;
-  background-image: url("Globe.PNG");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100%;
-}
-
-.model2 {
-  float: left;
-  position: relative;
-  width: 33%;
-  padding: 10px;
-  height: 100vh;
-  border: solid black;
-  ;
-}
-
-.model3 {
-  float: left;
-  position: relative;
-  width: 33%;
-  padding: 10px;
-  height: 100vh;
-  border: solid black;
-}
-
-.row:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
-@media only screen and (max-width: 600px) {
-  .model1 {
-    display: block;
-    width: auto;
-  }
-
-  .model2 {
-    display: block;
-    width: auto;
-  }
-
-  .model3 {
-    display: block;
-    width: auto;
-  }
-}
-
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0);
-  transition: background-color 0.5s ease;
-}
-
-.model1:hover .overlay {
-  display: block;
-  background: rgba(0, 0, 0, .3);
-}
-
-.model2:hover .overlay {
-  display: block;
-  background: rgba(0, 0, 0, .3);
-}
-
-.model3:hover .overlay {
-  display: block;
-  background: rgba(0, 0, 0, .3);
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 .title {
-  position: absolute;
+  position: relative;
   width: 500px;
-  left: 0;
-  top: 400px;
   font-weight: 700;
   font-size: 30px;
   text-align: center;
   text-transform: uppercase;
   color: black;
-  z-index: 1;
-  transition: top .5s ease;
 }
 
-.model1:hover  .title {
-  top: 230px;
+.descriptive {
+  width: 33%;
+  height: 100vh;
+  border: 3px solid black;
+  float: left;
 }
 
-.model2:hover  .title {
-  top: 230px;
+.globe_visual {
+  float: left;
+  width: 100%;
+  height: 33%;
+  border: solid black;
+  background-image: url("Globe.PNG");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: lightgrey;
 }
 
-.model3:hover  .title {
-  top: 230px;
+.text {
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.overlay {
+  position: absolute;
+  height: 32.5%;
+  width: 32.5%;
+  opacity: 1;
+  transition: .5s ease;
+  background: rgba(0, 0, 0, 0);
+}
+
+.globe_visual:hover .overlay{
+  display: block;
+  background: rgba(0, 0, 0, 0.849);
 }
 
 .ghost-button {
-  position: absolute;
+  position: relative;
   width: 500px;
   left:0;
-  top: 400px;
+  top: 200px;
   text-align: center;
   opacity: 0;
   transition: opacity .35s ease;
@@ -139,19 +85,11 @@ html, body {
   width: 200px;
   padding: 12px 48px;
   text-align: center;
-  color: black;
-  border: solid 2px black;
+  color: white;
+  border: solid 2px white;
   z-index: 1;
 }
 
-.model1:hover .ghost-button {
-  opacity: 1;
-}
-
-.model2:hover .ghost-button {
-  opacity: 1;
-}
-
-.model3:hover .ghost-button {
+.globe_visual:hover .ghost-button {
   opacity: 1;
 }
