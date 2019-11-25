@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="text/javascript" src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
     <script type="text/javascript" src='https://code.jquery.com/jquery-1.11.0.min.js'></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/2.2.0/topojson.js"></script>
     
 
     
-    <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     <script src="https://d3js.org/d3-drag.v1.min.js"></script>
     <script src="/D3/d3-legend.min.js"></script>
+    <!-- <script type="text/javascript" src="Scripts.js"></script> -->
 
     <link rel="shortcut icon" href="/Test_Data/d3.png" />
   </head>
@@ -78,7 +78,7 @@
       globePositionY;
 
     // Establish constants
-    const LOFT = 1.3; 
+    const LOFT = 2; 
 
     // SVG is the container for this visualization
     const svg = d3.select("svg"),
@@ -104,6 +104,7 @@
 
       
     var path = d3.geoPath().projection(projection);
+    var liftedPath = d3.geoPath().projection(liftedProjection);
 
     svg.call(d3.drag()
       .on("drag", function() {
@@ -122,40 +123,34 @@
     redraw();
 
     var airport_location = [];
-/*
-        d3.csv("/Test_Data/airports_edit.csv", function(data) {
-          data.forEach(function (d,i) {
-            airport_location[i] = 
-            [{
-              iata: d.iata,
-              name: d.name,
-              city:  d.city,
-              state:  d.state,
-              country:  d.country,
-              latitude:  +d.latitude,
-              longitude:  +d.longitude
-            }]
-          })
-        }); */
-
-
     var airports = new Map();
 
-    d3.csv("/Test_Data/Number_of_airports.csv", function(data){
-      data.forEach(function(d,i) {
+    d3.csv("/Test_Data/Number_of_airports.csv", function (d) {
+      d.forEach(function (d) {
         airports.set(d.ID_number, d.Airports)
-      });
-    });
+      })
+    })
+      // pullInfo();
+    async function pullInfo() {
+      
+      let airportNumberHolder = await d3.csv("/Test_Data/Number_of_airports.csv");
 
-        
+      airportNumberHolder.forEach(d => airports.set(d.ID_number, d.Airports));
+      console.log(airports)
+      drawGlobe();
+    }
+
+    let lines = [{type: "LineString", name: ["MCO", "LHR"], coordinates: [[-0.461941, 51.4706], [-81.30899811, 28.42939949]]}];        
     d3.csv("/Test_Data/Airports_In_Data.csv", function(data){
-      data.forEach(function(d,i) {
-        airport_location[i] = 
+      console.log(data);  
+      data.forEach(function (d) {
+        airport_location.push( 
         [{
           name: d.Airport_Code,
           latitude: +d.latitude,
           longitude: +d.longitude
-        }]
+        }]);
+
       })
     });
         
@@ -176,7 +171,7 @@
         .attr("height", height);  
 
       projection
-        .scale(300)
+        .scale(280)
         .translate([globePositionX, globePositionY])
         .precision(0.1)
         .clipAngle(90);
@@ -203,14 +198,14 @@
       g.append("circle")
         .attr("cx", globePositionX)
         .attr("cy", globePositionY)
-        .attr("r", 300)
+        .attr("r", 280)
         .style("fill", "white")
         .style("stroke-width", "0.3px")
         .style("stroke", "#006994")
         .style("pointer-events", "none");
 
 
-      g.selectAll("path")    
+      g.selectAll("path.countries")    
         .data(topojson.feature(world, world.objects.countries).features)
         .enter().append("path")
         .attr("class","countries")
@@ -222,11 +217,27 @@
         .append("title")
         .text(d => d.properties.name + ", " + airports.get(d.id));
 
+      console.log(lines)
+      g
+      .selectAll("path.line")
+      .data(lines)
+      .enter()
+      .append("path")
+      .attr("d", function(d) {return liftedPath(d)})
+      .attr("class","line")
+      .style("stroke-width", "1")
+      .style("stroke", "red")
+      .style("fill", "none")
+        .append("title")
+        .text(d => d.name[0] + " to " + d.name[1]);;
+
+
       startSpin();
       drawGraticule();
 
 
     });
+
 
 
 

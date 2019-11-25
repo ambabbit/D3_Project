@@ -8,9 +8,9 @@ pullData();
 
 async function pullData() {
     airportSchedule1 = await d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019 Yes CodeShare.csv");
-    airportSchedule2 = await d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019_No Codeshare.csv")
-    
-    airportSchedule = airportSchedule1.concat(airportSchedule2);
+    airportSchedule2 = await d3.csv("./Test_Data/SCHEDULES_ALL_ALL_DIR_01DEC2019_31DEC2019_No Codeshare.csv");
+
+    airportSchedule =  airportSchedule1.concat(await airportSchedule2);
 }
 
 async function FindAllRelatedAirports(s) {
@@ -18,7 +18,7 @@ async function FindAllRelatedAirports(s) {
     match = new Set(),
     test = [];
    
-    const results = airSchedule.filter(airport => airport["Origin Airport"] == s || airport["Destination Airport"] == s)
+    let results = airSchedule.filter(airport => airport["Origin Airport"] == s || airport["Destination Airport"] == s)
    
     results.forEach(function (d){
         if (d["Origin Airport"] != s) {
